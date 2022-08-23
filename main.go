@@ -9,6 +9,9 @@ import (
 
 var (
 	sidebarView *gui.SidebarView
+	branchView  *gui.BranchView
+	remotesView *gui.RemotesView
+	contentView *gui.ContentView
 )
 
 func main() {
@@ -20,7 +23,25 @@ func main() {
 	g.SetManagerFunc(layout)
 
 	// Side bar
-	sidebarView, err = gui.NewSidebarView()
+	sidebarView = gui.NewSidebarView()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// Branch layout
+	branchView = gui.NewBranchView()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// Remote layout
+	remotesView = gui.NewRemotesView()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// Main content
+	contentView = gui.NewContentView()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -38,6 +59,9 @@ func main() {
 
 func layout(g *gocui.Gui) error {
 	sidebarView.Draw(g)
+	branchView.Draw(g)
+	remotesView.Draw(g)
+	contentView.Draw(g)
 	return nil
 }
 

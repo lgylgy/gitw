@@ -14,18 +14,18 @@ type SidebarView struct {
 	y1   int
 }
 
-func NewSidebarView() (*SidebarView, error) {
+func NewSidebarView() *SidebarView {
 	return &SidebarView{
 		Name: "repositories",
 		x0:   0,
 		y0:   0,
 		x1:   20,
 		y1:   20,
-	}, nil
+	}
 }
 
-func (sB *SidebarView) Draw(g *gocui.Gui) {
-	if v, err := g.SetView(sB.Name, sB.x0, sB.y0, sB.x1, sB.y1); err != nil {
+func (sbv *SidebarView) Draw(g *gocui.Gui) {
+	if v, err := g.SetView(sbv.Name, sbv.x0, sbv.y0, sbv.x1, sbv.y1); err != nil {
 		v.SelFgColor = gocui.ColorBlack
 		v.SelBgColor = gocui.ColorGreen
 		v.Highlight = true
