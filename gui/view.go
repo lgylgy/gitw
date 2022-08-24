@@ -4,16 +4,25 @@ import "github.com/jroimartin/gocui"
 
 type View struct {
 	name string
-	x0   int
-	y0   int
-	x1   int
-	y1   int
+	x0   float32
+	y0   float32
+	x1   float32
+	y1   float32
 }
 
 func (v *View) GetName() string {
 	return v.name
 }
 
-func (v *View) Draw(g *gocui.Gui) (*gocui.View, error) {
-	return g.SetView(v.name, v.x0, v.y0, v.x1, v.y1)
+func (v *View) scale(g *gocui.Gui) (int, int, int, int) {
+	maxX, maxY := g.Size()
+	return int(v.x0 * float32(maxX)),
+		int(v.y0 * float32(maxY)),
+		int(v.x1 * float32(maxX)),
+		int(v.y1 * float32(maxY))
+}
+
+func (v *View) draw(g *gocui.Gui) (*gocui.View, error) {
+	x0, y0, x1, y1 := v.scale(g)
+	return g.SetView(v.name, x0, y0, x1, y1)
 }

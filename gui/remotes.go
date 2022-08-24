@@ -12,16 +12,16 @@ func NewRemotesView() *RemotesView {
 	return &RemotesView{
 		View{
 			name: "remotes",
-			x0:   51,
-			y0:   21,
-			x1:   100,
-			y1:   26,
+			x0:   0.51,
+			y0:   0.71,
+			x1:   0.99,
+			y1:   0.99,
 		},
 	}
 }
 
 func (rv *RemotesView) Draw(g *gocui.Gui) error {
-	view, err := rv.View.Draw(g)
+	view, err := rv.View.draw(g)
 	if err != nil {
 		if err != gocui.ErrUnknownView {
 			return err

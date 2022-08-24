@@ -16,14 +16,14 @@ func NewSidebarView() *SidebarView {
 			name: "repositories",
 			x0:   0,
 			y0:   0,
-			x1:   20,
-			y1:   20,
+			x1:   0.2,
+			y1:   0.7,
 		},
 	}
 }
 
 func (sbv *SidebarView) Draw(g *gocui.Gui) error {
-	view, err := sbv.View.Draw(g)
+	view, err := sbv.View.draw(g)
 	if err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
