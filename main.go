@@ -1,7 +1,10 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/jroimartin/gocui"
 	"github.com/lgylgy/gitw/gui"
@@ -14,7 +17,26 @@ var (
 	contentView *gui.ContentView
 )
 
+func usage() {
+	fmt.Fprint(flag.CommandLine.Output(), `
+    **** LGY Git GUI ****
+
+ --- Repo ---  ----- Content ----
+ |          |  |                |
+ |          |  |                |
+ ------------  ------------------
+ --- Branches --- --- Remotes ---
+ |              | |             |
+ ---------------- ---------------
+`)
+	flag.PrintDefaults()
+	os.Exit(2)
+}
+
 func main() {
+	flag.Usage = usage
+	flag.Parse()
+
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
 		log.Fatalln(err)
