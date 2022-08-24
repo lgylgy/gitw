@@ -42,31 +42,12 @@ func main() {
 		log.Fatalln(err)
 	}
 	defer g.Close()
-	g.SetManagerFunc(layout)
 
-	// Side bar
-	sidebarView = gui.NewSidebarView()
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	// Branch layout
-	branchView = gui.NewBranchView()
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	// Remote layout
-	remotesView = gui.NewRemotesView()
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	// Main content
-	contentView = gui.NewContentView()
-	if err != nil {
-		log.Fatalln(err)
-	}
+	// Create views
+	layout := NewLayout()
+	g.SetManagerFunc(func(g *gocui.Gui) error {
+		return layout.Draw(g)
+	})
 
 	// Quit binding
 	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
@@ -77,26 +58,6 @@ func main() {
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
 		log.Fatalln(err)
 	}
-}
-
-func layout(g *gocui.Gui) error {
-	err := sidebarView.Draw(g)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	err = branchView.Draw(g)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	err = remotesView.Draw(g)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	err = contentView.Draw(g)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return nil
 }
 
 func quit(g *gocui.Gui, v *gocui.View) error {
