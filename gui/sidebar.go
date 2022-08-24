@@ -24,16 +24,21 @@ func NewSidebarView() *SidebarView {
 	}
 }
 
-func (sbv *SidebarView) Draw(g *gocui.Gui) {
-	if v, err := g.SetView(sbv.Name, sbv.x0, sbv.y0, sbv.x1, sbv.y1); err != nil {
-		v.SelFgColor = gocui.ColorBlack
-		v.SelBgColor = gocui.ColorGreen
-		v.Highlight = true
+func (sbv *SidebarView) Draw(g *gocui.Gui) error {
+	view, err := g.SetView(sbv.Name, sbv.x0, sbv.y0, sbv.x1, sbv.y1)
+	if err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+		view.SelFgColor = gocui.ColorBlack
+		view.SelBgColor = gocui.ColorGreen
+		view.Highlight = true
 
 		repositories := []string{"repo1", "repo2", "repo3"}
 		for _, item := range repositories {
-			fmt.Fprintf(v, "%s\n", item)
+			fmt.Fprintf(view, "%s\n", item)
 		}
-		v.Title = "LGY repositories"
+		view.Title = "LGY repositories"
 	}
+	return nil
 }

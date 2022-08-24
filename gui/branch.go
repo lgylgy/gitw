@@ -1,8 +1,6 @@
 package gui
 
 import (
-	"log"
-
 	"github.com/jroimartin/gocui"
 )
 
@@ -24,10 +22,13 @@ func NewBranchView() *BranchView {
 	}
 }
 
-func (sv *BranchView) Draw(g *gocui.Gui) {
-	if v, err := g.SetView(sv.Name, sv.x0, sv.y0, sv.x1, sv.y1); err != nil {
-		log.Println(v)
-		log.Println(err)
+func (sv *BranchView) Draw(g *gocui.Gui) error {
+	v, err := g.SetView(sv.Name, sv.x0, sv.y0, sv.x1, sv.y1)
+	if err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
 		v.Title = "Current branch"
 	}
+	return nil
 }

@@ -22,7 +22,12 @@ func NewContentView() *ContentView {
 	}
 }
 
-func (cv *ContentView) Draw(g *gocui.Gui) {
-	if _, err := g.SetView(cv.Name, cv.x0, cv.y0, cv.x1, cv.y1); err != nil {
+func (cv *ContentView) Draw(g *gocui.Gui) error {
+	_, err := g.SetView(cv.Name, cv.x0, cv.y0, cv.x1, cv.y1)
+	if err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
 	}
+	return nil
 }

@@ -80,10 +80,22 @@ func main() {
 }
 
 func layout(g *gocui.Gui) error {
-	sidebarView.Draw(g)
-	branchView.Draw(g)
-	remotesView.Draw(g)
-	contentView.Draw(g)
+	err := sidebarView.Draw(g)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = branchView.Draw(g)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = remotesView.Draw(g)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = contentView.Draw(g)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	return nil
 }
 

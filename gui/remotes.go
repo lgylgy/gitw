@@ -22,8 +22,13 @@ func NewRemotesView() *RemotesView {
 	}
 }
 
-func (rv *RemotesView) Draw(g *gocui.Gui) {
-	if v, err := g.SetView(rv.Name, rv.x0, rv.y0, rv.x1, rv.y1); err != nil {
-		v.Title = "Remotes"
+func (rv *RemotesView) Draw(g *gocui.Gui) error {
+	view, err := g.SetView(rv.Name, rv.x0, rv.y0, rv.x1, rv.y1)
+	if err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+		view.Title = "Remotes"
 	}
+	return nil
 }
