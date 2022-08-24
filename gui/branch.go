@@ -15,7 +15,7 @@ func NewBranchView() *BranchView {
 			x0:   0,
 			y0:   0.71,
 			x1:   0.5,
-			y1:   0.99,
+			y1:   0.89,
 		},
 	}
 }

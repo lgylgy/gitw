@@ -23,6 +23,7 @@ func NewLayout(g *gocui.Gui) *Layout {
 			gui.NewBranchView(),
 			gui.NewRemotesView(),
 			gui.NewContentView(),
+			gui.NewLogView(),
 		},
 	}
 }

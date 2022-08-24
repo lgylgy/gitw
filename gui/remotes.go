@@ -15,7 +15,7 @@ func NewRemotesView() *RemotesView {
 			x0:   0.51,
 			y0:   0.71,
 			x1:   0.99,
-			y1:   0.99,
+			y1:   0.89,
 		},
 	}
 }
