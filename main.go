@@ -7,14 +7,6 @@ import (
 	"os"
 
 	"github.com/jroimartin/gocui"
-	"github.com/lgylgy/gitw/gui"
-)
-
-var (
-	sidebarView *gui.SidebarView
-	branchView  *gui.BranchView
-	remotesView *gui.RemotesView
-	contentView *gui.ContentView
 )
 
 func usage() {
@@ -44,12 +36,12 @@ func main() {
 	defer g.Close()
 
 	// Create views
-	layout := NewLayout()
+	layout := NewLayout(g)
 	g.SetManagerFunc(func(g *gocui.Gui) error {
 		return layout.Draw(g)
 	})
 
-	// Quit binding
+	// Key binding
 	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
 		log.Fatalln(err)
 	}

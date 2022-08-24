@@ -16,10 +16,10 @@ type Layout struct {
 	views []View
 }
 
-func NewLayout() *Layout {
+func NewLayout(g *gocui.Gui) *Layout {
 	return &Layout{
 		views: []View{
-			gui.NewSidebarView(),
+			gui.NewSidebarView(g),
 			gui.NewBranchView(),
 			gui.NewRemotesView(),
 			gui.NewContentView(),

@@ -22,11 +22,9 @@ func NewBranchView() *BranchView {
 
 func (sv *BranchView) Draw(g *gocui.Gui) error {
 	view, err := sv.View.draw(g)
-	if err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
+	if err == gocui.ErrUnknownView {
 		view.Title = "Current branch"
+		return nil
 	}
-	return nil
+	return err
 }
