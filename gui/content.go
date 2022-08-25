@@ -1,9 +1,8 @@
 package gui
 
 import (
-	"fmt"
-
 	"github.com/jroimartin/gocui"
+	"github.com/lgylgy/gitw/git"
 )
 
 type ContentView struct {
@@ -30,12 +29,11 @@ func (cv *ContentView) Draw(g *gocui.Gui) error {
 	return err
 }
 
-func (cv *ContentView) Update(g *gocui.Gui, text string) error {
+func (cv *ContentView) Update(g *gocui.Gui, _ *git.Repository) error {
 	view, err := cv.View.get(g)
 	if err != nil {
 		return err
 	}
 	view.Clear()
-	fmt.Fprint(view, text)
 	return nil
 }

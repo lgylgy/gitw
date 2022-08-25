@@ -1,24 +1,19 @@
 package gui
 
 import (
-	"fmt"
-
 	"github.com/jroimartin/gocui"
 	"github.com/lgylgy/gitw/git"
 )
 
 type SidebarView struct {
 	View
-	current int
-	repos   []string
-	change  chan<- string
+	index        int
+	repositories *git.Repositories
+	change       chan<- *git.Repository
 }
 
-func NewSidebarView(g *gocui.Gui, change chan<- string, config *git.Config) *SidebarView {
-	repos := []string{}
-	for _, repo := range config.Repositories {
-		repos = append(repos, repo.Name)
-	}
+func NewSidebarView(g *gocui.Gui, change chan<- *git.Repository,
+	repositories *git.Repositories) *SidebarView {
 	view := &SidebarView{
 		View{
 			name: "repositories",
@@ -28,7 +23,7 @@ func NewSidebarView(g *gocui.Gui, change chan<- string, config *git.Config) *Sid
 			y1:   0.7,
 		},
 		0,
-		repos,
+		repositories,
 		change,
 	}
 	return view
@@ -36,8 +31,8 @@ func NewSidebarView(g *gocui.Gui, change chan<- string, config *git.Config) *Sid
 
 func (sbv *SidebarView) onChange(position int) func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		newPosition := sbv.current + position
-		if newPosition < 0 || newPosition >= len(sbv.repos) {
+		newPosition := sbv.index + position
+		if newPosition < 0 || newPosition >= sbv.repositories.Count() {
 			return nil
 		}
 		view, err := g.View(sbv.View.name)
@@ -48,8 +43,9 @@ func (sbv *SidebarView) onChange(position int) func(g *gocui.Gui, v *gocui.View)
 		if err != nil {
 			return err
 		}
-		sbv.current = newPosition
-		sbv.change <- sbv.repos[sbv.current]
+		sbv.index = newPosition
+
+		sbv.change <- sbv.repositories.Get(sbv.index)
 		return nil
 	}
 }
@@ -75,15 +71,14 @@ func (sbv *SidebarView) Draw(g *gocui.Gui) error {
 		view.SelFgColor = gocui.ColorBlack
 		view.SelBgColor = gocui.ColorGreen
 		view.Highlight = true
-		for _, item := range sbv.repos {
-			fmt.Fprintf(view, "%s\n", item)
-		}
+
+		sbv.repositories.Display(view)
 		view.Title = "LGY repositories"
 		return nil
 	}
 	return err
 }
 
-func (sbv *SidebarView) Update(*gocui.Gui, string) error {
+func (sbv *SidebarView) Update(*gocui.Gui, *git.Repository) error {
 	return nil
 }

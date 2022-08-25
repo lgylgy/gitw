@@ -42,7 +42,8 @@ func main() {
 	}
 
 	// Config file
-	config, err := git.LoadConfiguration(os.Args[1])
+	repositories := git.NewRepositories()
+	err := repositories.Load(os.Args[1])
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -54,7 +55,7 @@ func main() {
 	defer g.Close()
 
 	// Create views
-	layout := NewLayout(g, config)
+	layout := NewLayout(g, repositories)
 	g.SetManagerFunc(func(g *gocui.Gui) error {
 		return layout.Draw(g)
 	})

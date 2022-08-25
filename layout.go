@@ -9,21 +9,21 @@ import (
 )
 
 type View interface {
-	Draw(g *gocui.Gui) error
-	Update(g *gocui.Gui, text string) error
+	Draw(*gocui.Gui) error
+	Update(*gocui.Gui, *git.Repository) error
 	GetName() string
 }
 
 type Layout struct {
 	views     []View
-	onChanged chan string
+	onChanged chan *git.Repository
 }
 
-func NewLayout(g *gocui.Gui, config *git.Config) *Layout {
-	changed := make(chan string)
+func NewLayout(g *gocui.Gui, repositories *git.Repositories) *Layout {
+	changed := make(chan *git.Repository)
 	layout := &Layout{
 		views: []View{
-			gui.NewSidebarView(g, changed, config),
+			gui.NewSidebarView(g, changed, repositories),
 			gui.NewBranchView(),
 			gui.NewRemotesView(),
 			gui.NewContentView(),
@@ -32,9 +32,9 @@ func NewLayout(g *gocui.Gui, config *git.Config) *Layout {
 		onChanged: changed,
 	}
 	go func() {
-		for text := range changed {
+		for repository := range changed {
 			for _, view := range layout.views {
-				view.Update(g, text)
+				view.Update(g, repository)
 			}
 		}
 	}()

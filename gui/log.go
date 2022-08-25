@@ -2,6 +2,7 @@ package gui
 
 import (
 	"github.com/jroimartin/gocui"
+	"github.com/lgylgy/gitw/git"
 )
 
 type LogView struct {
@@ -29,7 +30,7 @@ func (lv *LogView) Draw(g *gocui.Gui) error {
 	return err
 }
 
-func (lv *LogView) Update(g *gocui.Gui, text string) error {
+func (lv *LogView) Update(g *gocui.Gui, _ *git.Repository) error {
 	_, err := lv.View.get(g)
 	if err != nil {
 		return err

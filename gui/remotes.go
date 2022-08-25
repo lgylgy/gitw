@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jroimartin/gocui"
+	"github.com/lgylgy/gitw/git"
 )
 
 type RemotesView struct {
@@ -14,7 +15,7 @@ func NewRemotesView() *RemotesView {
 	return &RemotesView{
 		View{
 			name: "remotes",
-			x0:   0.51,
+			x0:   0.61,
 			y0:   0.74,
 			x1:   0.99,
 			y1:   0.89,
@@ -31,12 +32,19 @@ func (rv *RemotesView) Draw(g *gocui.Gui) error {
 	return err
 }
 
-func (rv *RemotesView) Update(g *gocui.Gui, text string) error {
+func (rv *RemotesView) Update(g *gocui.Gui, current *git.Repository) error {
 	view, err := rv.View.get(g)
 	if err != nil {
 		return err
 	}
-	view.Clear()
-	fmt.Fprint(view, text)
+	remotes, err := current.GetRemotes()
+	if err != nil {
+		return err
+	}
+	g.Update(func(g *gocui.Gui) error {
+		view.Clear()
+		fmt.Fprintf(view, "%s\n", remotes)
+		return nil
+	})
 	return nil
 }
