@@ -9,23 +9,35 @@ import (
 
 type View interface {
 	Draw(g *gocui.Gui) error
+	Update(g *gocui.Gui, text string) error
 	GetName() string
 }
 
 type Layout struct {
-	views []View
+	views     []View
+	onChanged chan string
 }
 
 func NewLayout(g *gocui.Gui) *Layout {
-	return &Layout{
+	changed := make(chan string)
+	layout := &Layout{
 		views: []View{
-			gui.NewSidebarView(g),
+			gui.NewSidebarView(g, changed),
 			gui.NewBranchView(),
 			gui.NewRemotesView(),
 			gui.NewContentView(),
 			gui.NewLogView(),
 		},
+		onChanged: changed,
 	}
+	go func() {
+		for text := range changed {
+			for _, view := range layout.views {
+				view.Update(g, text)
+			}
+		}
+	}()
+	return layout
 }
 
 func (l *Layout) Draw(g *gocui.Gui) error {

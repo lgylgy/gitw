@@ -28,3 +28,11 @@ func (lv *LogView) Draw(g *gocui.Gui) error {
 	}
 	return err
 }
+
+func (lv *LogView) Update(g *gocui.Gui, text string) error {
+	_, err := lv.View.get(g)
+	if err != nil {
+		return err
+	}
+	return nil
+}

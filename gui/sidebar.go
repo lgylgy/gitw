@@ -10,9 +10,10 @@ type SidebarView struct {
 	View
 	current int
 	repos   []string
+	change  chan<- string
 }
 
-func NewSidebarView(g *gocui.Gui) *SidebarView {
+func NewSidebarView(g *gocui.Gui, change chan<- string) *SidebarView {
 	view := &SidebarView{
 		View{
 			name: "repositories",
@@ -23,6 +24,7 @@ func NewSidebarView(g *gocui.Gui) *SidebarView {
 		},
 		0,
 		[]string{"repo1", "repo2", "repo3"},
+		change,
 	}
 	return view
 }
@@ -42,6 +44,7 @@ func (sbv *SidebarView) onChange(position int) func(g *gocui.Gui, v *gocui.View)
 			return err
 		}
 		sbv.current = newPosition
+		sbv.change <- sbv.repos[sbv.current]
 		return nil
 	}
 }
@@ -74,4 +77,8 @@ func (sbv *SidebarView) Draw(g *gocui.Gui) error {
 		return nil
 	}
 	return err
+}
+
+func (sbv *SidebarView) Update(*gocui.Gui, string) error {
+	return nil
 }

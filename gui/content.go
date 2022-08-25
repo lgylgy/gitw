@@ -1,6 +1,8 @@
 package gui
 
 import (
+	"fmt"
+
 	"github.com/jroimartin/gocui"
 )
 
@@ -26,4 +28,14 @@ func (cv *ContentView) Draw(g *gocui.Gui) error {
 		return nil
 	}
 	return err
+}
+
+func (cv *ContentView) Update(g *gocui.Gui, text string) error {
+	view, err := cv.View.get(g)
+	if err != nil {
+		return err
+	}
+	view.Clear()
+	fmt.Fprint(view, text)
+	return nil
 }

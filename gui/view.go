@@ -26,3 +26,7 @@ func (v *View) draw(g *gocui.Gui) (*gocui.View, error) {
 	x0, y0, x1, y1 := v.scale(g)
 	return g.SetView(v.name, x0, y0, x1, y1)
 }
+
+func (v *View) get(g *gocui.Gui) (*gocui.View, error) {
+	return g.View(v.name)
+}
