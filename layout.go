@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jroimartin/gocui"
+	"github.com/lgylgy/gitw/git"
 	"github.com/lgylgy/gitw/gui"
 )
 
@@ -18,11 +19,11 @@ type Layout struct {
 	onChanged chan string
 }
 
-func NewLayout(g *gocui.Gui) *Layout {
+func NewLayout(g *gocui.Gui, config *git.Config) *Layout {
 	changed := make(chan string)
 	layout := &Layout{
 		views: []View{
-			gui.NewSidebarView(g, changed),
+			gui.NewSidebarView(g, changed, config),
 			gui.NewBranchView(),
 			gui.NewRemotesView(),
 			gui.NewContentView(),

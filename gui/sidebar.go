@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jroimartin/gocui"
+	"github.com/lgylgy/gitw/git"
 )
 
 type SidebarView struct {
@@ -13,7 +14,11 @@ type SidebarView struct {
 	change  chan<- string
 }
 
-func NewSidebarView(g *gocui.Gui, change chan<- string) *SidebarView {
+func NewSidebarView(g *gocui.Gui, change chan<- string, config *git.Config) *SidebarView {
+	repos := []string{}
+	for _, repo := range config.Repositories {
+		repos = append(repos, repo.Name)
+	}
 	view := &SidebarView{
 		View{
 			name: "repositories",
@@ -23,7 +28,7 @@ func NewSidebarView(g *gocui.Gui, change chan<- string) *SidebarView {
 			y1:   0.7,
 		},
 		0,
-		[]string{"repo1", "repo2", "repo3"},
+		repos,
 		change,
 	}
 	return view

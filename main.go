@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/jroimartin/gocui"
+	"github.com/lgylgy/gitw/git"
 )
 
 func usage() {
@@ -23,6 +24,9 @@ func usage() {
  --- Log-------------------------
  |                             |
  --------------------------------
+
+ /gitw config.json
+
 `)
 	flag.PrintDefaults()
 	os.Exit(2)
@@ -32,6 +36,17 @@ func main() {
 	flag.Usage = usage
 	flag.Parse()
 
+	if len(os.Args) != 2 {
+		log.Print("missing configuration file")
+		usage()
+	}
+
+	// Config file
+	config, err := git.LoadConfiguration(os.Args[1])
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
 		log.Fatalln(err)
@@ -39,18 +54,20 @@ func main() {
 	defer g.Close()
 
 	// Create views
-	layout := NewLayout(g)
+	layout := NewLayout(g, config)
 	g.SetManagerFunc(func(g *gocui.Gui) error {
 		return layout.Draw(g)
 	})
 
 	// Key binding
-	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
+	err = g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit)
+	if err != nil {
 		log.Fatalln(err)
 	}
 
 	// Main loop
-	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
+	err = g.MainLoop()
+	if err != nil && err != gocui.ErrQuit {
 		log.Fatalln(err)
 	}
 }
