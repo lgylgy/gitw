@@ -43,7 +43,7 @@ func (bv *BranchView) Update(g *gocui.Gui, current *git.Repository) error {
 	}
 	g.Update(func(g *gocui.Gui) error {
 		view.Clear()
-		fmt.Fprintf(view, " \n%s\n", name)
+		fmt.Fprintf(view, "%s\n", name)
 		return nil
 	})
 	return nil

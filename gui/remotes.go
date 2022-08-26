@@ -43,7 +43,9 @@ func (rv *RemotesView) Update(g *gocui.Gui, current *git.Repository) error {
 	}
 	g.Update(func(g *gocui.Gui) error {
 		view.Clear()
-		fmt.Fprintf(view, "%s\n", remotes)
+		for _, remote := range remotes {
+			fmt.Fprintf(view, "%s\n", remote)
+		}
 		return nil
 	})
 	return nil

@@ -18,10 +18,18 @@ func cmd(dir string, args []string) (string, error) {
 
 func getCurrentBranch(dir string) (string, error) {
 	args := []string{"git", "branch", "--verbose"}
-	return cmd(dir, args)
+	output, err := cmd(dir, args)
+	if err != nil {
+		return "", err
+	}
+	return formatCurrentBranch(output), err
 }
 
-func getRemotes(dir string) (string, error) {
+func getRemotes(dir string) ([]string, error) {
 	args := []string{"git", "remote", "--verbose"}
-	return cmd(dir, args)
+	output, err := cmd(dir, args)
+	if err != nil {
+		return nil, err
+	}
+	return formatRemotes(output), err
 }

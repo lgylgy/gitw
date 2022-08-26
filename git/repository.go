@@ -6,17 +6,17 @@ type Repository struct {
 }
 
 func (r *Repository) GetCurrentBranch() (string, error) {
-	text, err := getCurrentBranch(r.Path)
+	branch, err := getCurrentBranch(r.Path)
 	if err != nil {
 		return "", err
 	}
-	return text, nil
+	return branch, nil
 }
 
-func (r *Repository) GetRemotes() (string, error) {
-	text, err := getRemotes(r.Path)
+func (r *Repository) GetRemotes() ([]string, error) {
+	remotes, err := getRemotes(r.Path)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return text, nil
+	return remotes, nil
 }

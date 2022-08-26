@@ -34,7 +34,7 @@ func NewLayout(g *gocui.Gui, repositories *git.Repositories) *Layout {
 	go func() {
 		for repository := range changed {
 			for _, view := range layout.views {
-				view.Update(g, repository)
+				_ = view.Update(g, repository)
 			}
 		}
 	}()
