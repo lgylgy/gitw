@@ -53,6 +53,8 @@ func main() {
 		log.Fatalln(err)
 	}
 	defer g.Close()
+	g.Highlight = true
+	g.SelFgColor = gocui.ColorGreen
 
 	// Create views
 	layout := NewLayout(g, repositories)
