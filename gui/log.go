@@ -25,6 +25,7 @@ func (lv *LogView) Draw(g *gocui.Gui) error {
 	view, err := lv.View.draw(g)
 	if err == gocui.ErrUnknownView {
 		view.Title = "Log"
+		view.Wrap = true
 		return nil
 	}
 	return err

@@ -24,8 +24,9 @@ func NewContentView() *ContentView {
 }
 
 func (cv *ContentView) Draw(g *gocui.Gui) error {
-	_, err := cv.View.draw(g)
+	view, err := cv.View.draw(g)
 	if err == gocui.ErrUnknownView {
+		view.Wrap = true
 		return nil
 	}
 	return err

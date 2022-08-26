@@ -27,6 +27,7 @@ func (rv *RemotesView) Draw(g *gocui.Gui) error {
 	view, err := rv.View.draw(g)
 	if err == gocui.ErrUnknownView {
 		view.Title = "Remotes"
+		view.Wrap = true
 		return nil
 	}
 	return err

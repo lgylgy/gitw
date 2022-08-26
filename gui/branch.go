@@ -27,6 +27,7 @@ func (bv *BranchView) Draw(g *gocui.Gui) error {
 	view, err := bv.View.draw(g)
 	if err == gocui.ErrUnknownView {
 		view.Title = "Current branch"
+		view.Wrap = true
 		return nil
 	}
 	return err
