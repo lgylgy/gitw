@@ -33,3 +33,12 @@ func getRemotes(dir string) ([]string, error) {
 	}
 	return formatRemotes(output), err
 }
+
+func getCommits(dir string) (string, error) {
+	args := []string{"git", "log", "--graph", "--pretty=oneline", "--abbrev-commit", "--max-count=15"}
+	output, err := cmd(dir, args)
+	if err != nil {
+		return "", err
+	}
+	return output, err
+}

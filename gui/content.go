@@ -1,6 +1,8 @@
 package gui
 
 import (
+	"fmt"
+
 	"github.com/jroimartin/gocui"
 	"github.com/lgylgy/gitw/git"
 )
@@ -29,11 +31,20 @@ func (cv *ContentView) Draw(g *gocui.Gui) error {
 	return err
 }
 
-func (cv *ContentView) Update(g *gocui.Gui, _ *git.Repository) error {
+func (cv *ContentView) Update(g *gocui.Gui, current *git.Repository) error {
 	view, err := cv.View.get(g)
 	if err != nil {
 		return err
 	}
 	view.Clear()
+	commits, err := current.GetCommits()
+	if err != nil {
+		return err
+	}
+	g.Update(func(g *gocui.Gui) error {
+		view.Clear()
+		fmt.Fprintf(view, "%s\n", commits)
+		return nil
+	})
 	return nil
 }

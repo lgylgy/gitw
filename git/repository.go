@@ -20,3 +20,11 @@ func (r *Repository) GetRemotes() ([]string, error) {
 	}
 	return remotes, nil
 }
+
+func (r *Repository) GetCommits() (string, error) {
+	commits, err := getCommits(r.Path)
+	if err != nil {
+		return "", err
+	}
+	return commits, nil
+}
