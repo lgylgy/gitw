@@ -3,7 +3,6 @@ package git
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 )
 
@@ -39,16 +38,14 @@ func (r *Repositories) Load(config string) error {
 	return nil
 }
 
-func (r *Repositories) Count() int {
-	return len(r.list)
-}
-
-func (r *Repositories) Get(index int) *Repository {
+func (r *Repositories) get(index int) *Repository {
 	return r.list[index]
 }
 
-func (r *Repositories) Display(writer io.Writer) {
+func (r *Repositories) getNames() []string {
+	result := []string{}
 	for _, item := range r.list {
-		fmt.Fprintf(writer, "%s\n", item.Name)
+		result = append(result, item.Name)
 	}
+	return result
 }

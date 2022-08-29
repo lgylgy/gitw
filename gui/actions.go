@@ -1,17 +1,21 @@
 package gui
 
 import (
+	"fmt"
+
 	"github.com/jroimartin/gocui"
 	"github.com/lgylgy/gitw/git"
 )
 
 type ActionsView struct {
 	View
-	index  int
+	index   int
+	manager *git.Manager
+
 	events chan<- *Event
 }
 
-func NewActionsView(g *gocui.Gui, events chan<- *Event) *ActionsView {
+func NewActionsView(g *gocui.Gui, events chan<- *Event, manager *git.Manager) *ActionsView {
 	view := &ActionsView{
 		View{
 			name: "actions",
@@ -21,6 +25,7 @@ func NewActionsView(g *gocui.Gui, events chan<- *Event) *ActionsView {
 			y1:   0.7,
 		},
 		0,
+		manager,
 		events,
 	}
 	return view
@@ -28,6 +33,19 @@ func NewActionsView(g *gocui.Gui, events chan<- *Event) *ActionsView {
 
 func (av *ActionsView) onChange(position int) func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
+		newPosition := av.index + position
+		if newPosition < 0 || newPosition >= len(av.manager.ListActions()) {
+			return nil
+		}
+		view, err := g.View(av.View.name)
+		if err != nil {
+			return err
+		}
+		err = view.SetCursor(0, newPosition)
+		if err != nil {
+			return err
+		}
+		av.index = newPosition
 		return nil
 	}
 }
@@ -68,6 +86,17 @@ func (av *ActionsView) Draw(g *gocui.Gui) error {
 	return err
 }
 
-func (av *ActionsView) Update(*gocui.Gui, *git.Repository) error {
+func (av *ActionsView) Update(g *gocui.Gui, _ *git.Repository) error {
+	view, err := av.View.get(g)
+	if err != nil {
+		return err
+	}
+	g.Update(func(g *gocui.Gui) error {
+		view.Clear()
+		for _, repo := range av.manager.ListActions() {
+			fmt.Fprintf(view, "%s\n", repo)
+		}
+		return nil
+	})
 	return nil
 }

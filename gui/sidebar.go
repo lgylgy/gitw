@@ -1,19 +1,21 @@
 package gui
 
 import (
+	"fmt"
+
 	"github.com/jroimartin/gocui"
 	"github.com/lgylgy/gitw/git"
 )
 
 type SidebarView struct {
 	View
-	index        int
-	repositories *git.Repositories
-	events       chan<- *Event
+	index   int
+	manager *git.Manager
+	events  chan<- *Event
 }
 
 func NewSidebarView(g *gocui.Gui, events chan<- *Event,
-	repositories *git.Repositories) *SidebarView {
+	manager *git.Manager) *SidebarView {
 	view := &SidebarView{
 		View{
 			name: "repositories",
@@ -23,7 +25,7 @@ func NewSidebarView(g *gocui.Gui, events chan<- *Event,
 			y1:   0.7,
 		},
 		0,
-		repositories,
+		manager,
 		events,
 	}
 	return view
@@ -32,7 +34,7 @@ func NewSidebarView(g *gocui.Gui, events chan<- *Event,
 func (sbv *SidebarView) onChange(position int) func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
 		newPosition := sbv.index + position
-		if newPosition < 0 || newPosition >= sbv.repositories.Count() {
+		if newPosition < 0 || newPosition >= len(sbv.manager.ListRepos()) {
 			return nil
 		}
 		view, err := g.View(sbv.View.name)
@@ -44,11 +46,11 @@ func (sbv *SidebarView) onChange(position int) func(g *gocui.Gui, v *gocui.View)
 			return err
 		}
 		sbv.index = newPosition
+		selected := sbv.manager.Select(sbv.index)
 		sbv.events <- &Event{
 			T:    Update,
-			Repo: sbv.repositories.Get(sbv.index),
+			Repo: selected,
 		}
-		sbv.repositories.Get(sbv.index)
 		return nil
 	}
 }
@@ -84,7 +86,9 @@ func (sbv *SidebarView) Draw(g *gocui.Gui) error {
 		view.SelBgColor = gocui.ColorGreen
 		view.Highlight = true
 
-		sbv.repositories.Display(view)
+		for _, repo := range sbv.manager.ListRepos() {
+			fmt.Fprintf(view, "%s\n", repo)
+		}
 		view.Title = "LGY repositories"
 		return nil
 	}
@@ -92,6 +96,20 @@ func (sbv *SidebarView) Draw(g *gocui.Gui) error {
 }
 
 func (sbv *SidebarView) Update(g *gocui.Gui, _ *git.Repository) error {
-	_, err := g.SetCurrentView(sbv.View.name)
+	view, err := sbv.View.get(g)
+	if err != nil {
+		return err
+	}
+	_, err = g.SetCurrentView(sbv.View.name)
+	if err != nil {
+		return err
+	}
+	g.Update(func(g *gocui.Gui) error {
+		view.Clear()
+		for _, remote := range sbv.manager.ListRepos() {
+			fmt.Fprintf(view, "%s\n", remote)
+		}
+		return nil
+	})
 	return err
 }

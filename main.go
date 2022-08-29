@@ -54,7 +54,8 @@ func main() {
 	g.SelFgColor = gocui.ColorGreen
 
 	// Create views
-	layout := NewLayout(g, repositories)
+	manager := git.NewManager(repositories)
+	layout := NewLayout(g, manager)
 	g.SetManagerFunc(func(g *gocui.Gui) error {
 		layout.Manage()
 		return nil

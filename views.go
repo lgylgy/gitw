@@ -12,19 +12,19 @@ type View interface {
 	GetName() string
 }
 
-func CreateDefaultViews(g *gocui.Gui, repositories *git.Repositories, events chan<- *gui.Event) map[string]View {
+func CreateDefaultViews(g *gocui.Gui, manager *git.Manager, events chan<- *gui.Event) map[string]View {
 	return map[string]View{
-		"repositories": CreateView("repositories", g, repositories, events),
-		"branch":       CreateView("branch", g, repositories, events),
-		"remotes":      CreateView("remotes", g, repositories, events),
-		"content":      CreateView("content", g, repositories, events),
+		"repositories": CreateView("repositories", g, manager, events),
+		"branch":       CreateView("branch", g, manager, events),
+		"remotes":      CreateView("remotes", g, manager, events),
+		"content":      CreateView("content", g, manager, events),
 	}
 }
 
-func CreateView(name string, g *gocui.Gui, repositories *git.Repositories, events chan<- *gui.Event) View {
+func CreateView(name string, g *gocui.Gui, manager *git.Manager, events chan<- *gui.Event) View {
 	switch name {
 	case "repositories":
-		return gui.NewSidebarView(g, events, repositories)
+		return gui.NewSidebarView(g, events, manager)
 	case "branch":
 		return gui.NewBranchView()
 	case "remotes":
@@ -32,7 +32,7 @@ func CreateView(name string, g *gocui.Gui, repositories *git.Repositories, event
 	case "content":
 		return gui.NewContentView()
 	case "actions":
-		return gui.NewActionsView(g, events)
+		return gui.NewActionsView(g, events, manager)
 	}
 	return nil
 }

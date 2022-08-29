@@ -9,22 +9,22 @@ import (
 )
 
 type Layout struct {
-	g      *gocui.Gui
-	repos  *git.Repositories
-	views  map[string]View
-	events chan *gui.Event
-	errors chan error
+	g       *gocui.Gui
+	manager *git.Manager
+	views   map[string]View
+	events  chan *gui.Event
+	errors  chan error
 }
 
-func NewLayout(g *gocui.Gui, repos *git.Repositories) *Layout {
+func NewLayout(g *gocui.Gui, manager *git.Manager) *Layout {
 	events := make(chan *gui.Event, 2)
 	errors := make(chan error, 2)
 	layout := &Layout{
-		g:      g,
-		repos:  repos,
-		views:  CreateDefaultViews(g, repos, events),
-		events: events,
-		errors: errors,
+		g:       g,
+		manager: manager,
+		views:   CreateDefaultViews(g, manager, events),
+		events:  events,
+		errors:  errors,
 	}
 	go layout.run()
 	return layout
@@ -115,15 +115,15 @@ func (l *Layout) delete(event *gui.Event) {
 }
 
 func (l *Layout) addView(event *gui.Event) {
-	view := CreateView(event.View, l.g, l.repos, l.events)
+	view := CreateView(event.View, l.g, l.manager, l.events)
 	if view != nil {
 		l.views[view.GetName()] = view
 		l.events <- &gui.Event{
-			T:    gui.Update,
-			View: view.GetName(),
+			T: gui.Draw,
 		}
 		l.events <- &gui.Event{
-			T: gui.Draw,
+			T:    gui.Update,
+			View: view.GetName(),
 		}
 		return
 	}
