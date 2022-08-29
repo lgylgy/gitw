@@ -14,7 +14,7 @@ type ContentView struct {
 func NewContentView() *ContentView {
 	return &ContentView{
 		View{
-			name: "main",
+			name: "content",
 			x0:   0.21,
 			y0:   0,
 			x1:   0.99,

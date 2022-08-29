@@ -21,9 +21,6 @@ func usage() {
  --- Branches --- --- Remotes ---
  |              | |             |
  ---------------- ---------------
- --- Log-------------------------
- |                             |
- --------------------------------
 
  /gitw config.json
 
@@ -59,7 +56,8 @@ func main() {
 	// Create views
 	layout := NewLayout(g, repositories)
 	g.SetManagerFunc(func(g *gocui.Gui) error {
-		return layout.Draw(g)
+		layout.Manage()
+		return nil
 	})
 
 	// Key binding
@@ -69,6 +67,7 @@ func main() {
 	}
 
 	// Main loop
+	layout.Manage()
 	err = g.MainLoop()
 	if err != nil && err != gocui.ErrQuit {
 		log.Fatalln(err)

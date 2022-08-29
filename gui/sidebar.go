@@ -9,10 +9,10 @@ type SidebarView struct {
 	View
 	index        int
 	repositories *git.Repositories
-	change       chan<- *git.Repository
+	events       chan<- *Event
 }
 
-func NewSidebarView(g *gocui.Gui, change chan<- *git.Repository,
+func NewSidebarView(g *gocui.Gui, events chan<- *Event,
 	repositories *git.Repositories) *SidebarView {
 	view := &SidebarView{
 		View{
@@ -24,7 +24,7 @@ func NewSidebarView(g *gocui.Gui, change chan<- *git.Repository,
 		},
 		0,
 		repositories,
-		change,
+		events,
 	}
 	return view
 }
@@ -44,8 +44,11 @@ func (sbv *SidebarView) onChange(position int) func(g *gocui.Gui, v *gocui.View)
 			return err
 		}
 		sbv.index = newPosition
-
-		sbv.change <- sbv.repositories.Get(sbv.index)
+		sbv.events <- &Event{
+			T:    Update,
+			Repo: sbv.repositories.Get(sbv.index),
+		}
+		sbv.repositories.Get(sbv.index)
 		return nil
 	}
 }
@@ -62,7 +65,6 @@ func (sbv *SidebarView) Draw(g *gocui.Gui) error {
 		if err != nil {
 			return err
 		}
-
 		_, err = g.SetCurrentView(sbv.View.name)
 		if err != nil {
 			return err
@@ -79,6 +81,7 @@ func (sbv *SidebarView) Draw(g *gocui.Gui) error {
 	return err
 }
 
-func (sbv *SidebarView) Update(*gocui.Gui, *git.Repository) error {
-	return nil
+func (sbv *SidebarView) Update(g *gocui.Gui, _ *git.Repository) error {
+	_, err := g.SetCurrentView(sbv.View.name)
+	return err
 }
