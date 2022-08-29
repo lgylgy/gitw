@@ -65,6 +65,16 @@ func (sbv *SidebarView) Draw(g *gocui.Gui) error {
 		if err != nil {
 			return err
 		}
+		err = g.SetKeybinding(sbv.View.name, gocui.KeySpace, gocui.ModNone, func(*gocui.Gui, *gocui.View) error {
+			sbv.events <- &Event{
+				T:    Add,
+				View: "actions",
+			}
+			return nil
+		})
+		if err != nil {
+			return err
+		}
 		_, err = g.SetCurrentView(sbv.View.name)
 		if err != nil {
 			return err

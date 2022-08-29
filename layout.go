@@ -8,30 +8,21 @@ import (
 	"github.com/lgylgy/gitw/gui"
 )
 
-type View interface {
-	Draw(*gocui.Gui) error
-	Update(*gocui.Gui, *git.Repository) error
-	GetName() string
-}
-
 type Layout struct {
 	g      *gocui.Gui
+	repos  *git.Repositories
 	views  map[string]View
 	events chan *gui.Event
 	errors chan error
 }
 
-func NewLayout(g *gocui.Gui, repositories *git.Repositories) *Layout {
+func NewLayout(g *gocui.Gui, repos *git.Repositories) *Layout {
 	events := make(chan *gui.Event, 2)
 	errors := make(chan error, 2)
 	layout := &Layout{
-		g: g,
-		views: map[string]View{
-			"repositories": gui.NewSidebarView(g, events, repositories),
-			"branch":       gui.NewBranchView(),
-			"remotes":      gui.NewRemotesView(),
-			"content":      gui.NewContentView(),
-		},
+		g:      g,
+		repos:  repos,
+		views:  CreateDefaultViews(g, repos, events),
 		events: events,
 		errors: errors,
 	}
@@ -50,7 +41,9 @@ func (l *Layout) run() {
 		select {
 		case event := <-l.events:
 			switch event.T {
-			case gui.Draw, gui.Add:
+			case gui.Add:
+				l.addView(event)
+			case gui.Draw:
 				l.draw(event)
 			case gui.Update:
 				l.update(event)
@@ -61,7 +54,7 @@ func (l *Layout) run() {
 			view := gui.NewErrorView(l.g, l.events, err)
 			l.views[view.GetName()] = view
 			l.events <- &gui.Event{
-				T:    gui.Draw,
+				T:    gui.Update,
 				View: view.GetName(),
 			}
 		}
@@ -119,4 +112,20 @@ func (l *Layout) delete(event *gui.Event) {
 			View: "repositories",
 		}
 	}
+}
+
+func (l *Layout) addView(event *gui.Event) {
+	view := CreateView(event.View, l.g, l.repos, l.events)
+	if view != nil {
+		l.views[view.GetName()] = view
+		l.events <- &gui.Event{
+			T:    gui.Update,
+			View: view.GetName(),
+		}
+		l.events <- &gui.Event{
+			T: gui.Draw,
+		}
+		return
+	}
+	l.errors <- fmt.Errorf("unknown view %s", event.View)
 }

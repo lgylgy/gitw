@@ -16,7 +16,7 @@ type ErrorView struct {
 func NewErrorView(g *gocui.Gui, events chan<- *Event, err error) *ErrorView {
 	return &ErrorView{
 		View{
-			name: "log",
+			name: "errors",
 			x0:   0.1,
 			y0:   0.1,
 			x1:   0.9,
@@ -30,13 +30,9 @@ func NewErrorView(g *gocui.Gui, events chan<- *Event, err error) *ErrorView {
 func (ev *ErrorView) Draw(g *gocui.Gui) error {
 	view, err := ev.View.draw(g)
 	if err == gocui.ErrUnknownView {
-		view.Title = "Log"
+		view.Title = "Error"
 		view.Wrap = true
-		_, err = g.SetCurrentView(ev.View.GetName())
-		if err != nil {
-			return err
-		}
-		_, err = g.SetViewOnTop(ev.View.GetName())
+		err := ev.active(g)
 		if err != nil {
 			return err
 		}

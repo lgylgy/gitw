@@ -30,3 +30,15 @@ func (v *View) draw(g *gocui.Gui) (*gocui.View, error) {
 func (v *View) get(g *gocui.Gui) (*gocui.View, error) {
 	return g.View(v.name)
 }
+
+func (v *View) active(g *gocui.Gui) error {
+	_, err := g.SetCurrentView(v.name)
+	if err != nil {
+		return err
+	}
+	_, err = g.SetViewOnTop(v.name)
+	if err != nil {
+		return err
+	}
+	return nil
+}
