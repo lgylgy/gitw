@@ -11,16 +11,12 @@ type RemotesView struct {
 	View
 }
 
-func NewRemotesView() *RemotesView {
-	return &RemotesView{
-		View{
-			name: "remotes",
-			x0:   0.61,
-			y0:   0.74,
-			x1:   0.99,
-			y1:   0.99,
-		},
+func NewRemotesView(g *gocui.Gui) *RemotesView {
+	view := &RemotesView{
+		newView("remotes", 0.61, 0.74, 0.99, 0.99),
 	}
+	go view.process(g)
+	return view
 }
 
 func (rv *RemotesView) Draw(g *gocui.Gui) error {
@@ -38,16 +34,17 @@ func (rv *RemotesView) Update(g *gocui.Gui, current *git.Repository) error {
 	if err != nil {
 		return err
 	}
-	remotes, err := current.GetRemotes()
-	if err != nil {
-		return err
-	}
-	g.Update(func(g *gocui.Gui) error {
-		view.Clear()
-		for _, remote := range remotes {
-			fmt.Fprintf(view, "%s\n", remote)
+	view.Clear()
+	rv.update(func() (string, error) {
+		remotes, err := current.GetRemotes()
+		if err != nil {
+			return "", err
 		}
-		return nil
+		result := ""
+		for _, remote := range remotes {
+			result += fmt.Sprintf("%s\n", remote)
+		}
+		return result, nil
 	})
 	return nil
 }

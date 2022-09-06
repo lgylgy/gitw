@@ -1,13 +1,37 @@
 package gui
 
-import "github.com/jroimartin/gocui"
+import (
+	"fmt"
+
+	"github.com/jroimartin/gocui"
+)
+
+func newView(name string, x0, y0, x1, y1 float32) View {
+	return View{
+		events: make(chan *event, 5),
+		id:     0,
+		name:   name,
+		x0:     x0,
+		y0:     y0,
+		x1:     x1,
+		y1:     y1,
+	}
+}
+
+type event struct {
+	id     int32
+	err    error
+	output string
+}
 
 type View struct {
-	name string
-	x0   float32
-	y0   float32
-	x1   float32
-	y1   float32
+	events chan *event
+	id     int32
+	name   string
+	x0     float32
+	y0     float32
+	x1     float32
+	y1     float32
 }
 
 func (v *View) GetName() string {
@@ -41,4 +65,32 @@ func (v *View) active(g *gocui.Gui) error {
 		return err
 	}
 	return nil
+}
+
+func (v *View) update(fun func() (string, error)) {
+	v.id++
+	go func(id int32) {
+		output, err := fun()
+		v.events <- &event{
+			id:     id,
+			err:    err,
+			output: output,
+		}
+	}(v.id)
+}
+
+func (v *View) process(g *gocui.Gui) {
+	for event := range v.events {
+		if event.id == v.id {
+			view, err := g.View(v.name)
+			if err != nil {
+				return
+			}
+			g.Update(func(g *gocui.Gui) error {
+				view.Clear()
+				fmt.Fprintf(view, "%s\n", event.output)
+				return nil
+			})
+		}
+	}
 }

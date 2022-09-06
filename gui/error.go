@@ -15,13 +15,7 @@ type ErrorView struct {
 
 func NewErrorView(g *gocui.Gui, events chan<- *Event, err error) *ErrorView {
 	return &ErrorView{
-		View{
-			name: "errors",
-			x0:   0.1,
-			y0:   0.1,
-			x1:   0.9,
-			y1:   0.9,
-		},
+		newView("errors", 0.1, 0.1, 0.9, 0.9),
 		events,
 		err,
 	}

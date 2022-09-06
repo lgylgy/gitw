@@ -17,13 +17,7 @@ type SidebarView struct {
 func NewSidebarView(g *gocui.Gui, events chan<- *Event,
 	manager *git.Manager) *SidebarView {
 	view := &SidebarView{
-		View{
-			name: "repositories",
-			x0:   0,
-			y0:   0,
-			x1:   0.2,
-			y1:   0.7,
-		},
+		newView("repositories", 0, 0, 0.2, 0.7),
 		0,
 		manager,
 		events,

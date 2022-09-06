@@ -26,13 +26,13 @@ func CreateView(name string, g *gocui.Gui, manager *git.Manager, events chan<- *
 	case "repositories":
 		return gui.NewSidebarView(g, events, manager)
 	case "branch":
-		return gui.NewBranchView()
+		return gui.NewBranchView(g)
 	case "remotes":
-		return gui.NewRemotesView()
+		return gui.NewRemotesView(g)
 	case "content":
-		return gui.NewContentView()
+		return gui.NewContentView(g)
 	case "actions":
-		return gui.NewActionsView(g, events, manager)
+		return gui.NewActionsView(events, manager)
 	}
 	return nil
 }

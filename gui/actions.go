@@ -15,20 +15,13 @@ type ActionsView struct {
 	events chan<- *Event
 }
 
-func NewActionsView(g *gocui.Gui, events chan<- *Event, manager *git.Manager) *ActionsView {
-	view := &ActionsView{
-		View{
-			name: "actions",
-			x0:   0.3,
-			y0:   0.3,
-			x1:   0.7,
-			y1:   0.7,
-		},
+func NewActionsView(events chan<- *Event, manager *git.Manager) *ActionsView {
+	return &ActionsView{
+		newView("actions", 0.3, 0.3, 0.7, 0.7),
 		0,
 		manager,
 		events,
 	}
-	return view
 }
 
 func (av *ActionsView) onChange(position int) func(g *gocui.Gui, v *gocui.View) error {
