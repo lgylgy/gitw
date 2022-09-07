@@ -33,6 +33,10 @@ func CreateView(name string, g *gocui.Gui, manager *git.Manager, events chan<- *
 		return gui.NewContentView(g)
 	case "actions":
 		return gui.NewActionsView(events, manager)
+	case "unstaged-changes":
+		return gui.NewDiffView(events, manager, false)
+	case "staged-changes":
+		return gui.NewDiffView(events, manager, true)
 	}
 	return nil
 }

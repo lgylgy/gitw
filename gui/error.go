@@ -32,8 +32,8 @@ func (ev *ErrorView) Draw(g *gocui.Gui) error {
 		}
 		err = g.SetKeybinding(ev.View.name, gocui.KeyCtrlX, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 			ev.events <- &Event{
-				T:    Remove,
-				View: ev.GetName(),
+				T:     Remove,
+				Views: []string{ev.GetName()},
 			}
 			return nil
 		})

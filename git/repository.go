@@ -28,3 +28,11 @@ func (r *Repository) GetCommits() (string, error) {
 	}
 	return commits, nil
 }
+
+func (r *Repository) GetDiff(cached bool) (string, error) {
+	commits, err := getDiff(r.Path, cached)
+	if err != nil {
+		return "", err
+	}
+	return commits, nil
+}

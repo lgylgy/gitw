@@ -5,14 +5,13 @@ import "github.com/lgylgy/gitw/git"
 type EventType int32
 
 const (
-	Draw   EventType = 1
-	Add    EventType = 2
-	Update EventType = 3
-	Remove EventType = 4
+	Add    EventType = 1
+	Update EventType = 2
+	Remove EventType = 3
 )
 
 type Event struct {
-	T    EventType
-	View string
-	Repo *git.Repository
+	T     EventType
+	Views []string
+	Repo  *git.Repository
 }

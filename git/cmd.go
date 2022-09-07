@@ -42,3 +42,15 @@ func getCommits(dir string) (string, error) {
 	}
 	return output, err
 }
+
+func getDiff(dir string, cached bool) (string, error) {
+	args := []string{"git", "diff", "--name-only"}
+	if cached {
+		args = append(args, "--cached")
+	}
+	output, err := cmd(dir, args)
+	if err != nil {
+		return "", err
+	}
+	return output, err
+}

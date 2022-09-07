@@ -31,8 +31,11 @@ func NewLayout(g *gocui.Gui, manager *git.Manager) *Layout {
 }
 
 func (l *Layout) Manage() {
-	l.events <- &gui.Event{
-		T: gui.Draw,
+	for _, view := range l.views {
+		err := view.Draw(l.g)
+		if err != nil {
+			l.errors <- fmt.Errorf("view %s: %v", view.GetName(), err)
+		}
 	}
 }
 
@@ -43,8 +46,6 @@ func (l *Layout) run() {
 			switch event.T {
 			case gui.Add:
 				l.addView(event)
-			case gui.Draw:
-				l.draw(event)
 			case gui.Update:
 				l.update(event)
 			case gui.Remove:
@@ -53,35 +54,16 @@ func (l *Layout) run() {
 		case err := <-l.errors:
 			view := gui.NewErrorView(l.g, l.events, err)
 			l.views[view.GetName()] = view
-			l.events <- &gui.Event{
-				T:    gui.Update,
-				View: view.GetName(),
-			}
-		}
-	}
-}
-
-func (l *Layout) draw(event *gui.Event) {
-	if event.View == "" {
-		for _, view := range l.views {
-			err := view.Draw(l.g)
-			if err != nil {
-				l.errors <- fmt.Errorf("view %s: %v", view.GetName(), err)
-			}
-		}
-		return
-	}
-	view, ok := l.views[event.View]
-	if ok {
-		err := view.Draw(l.g)
-		if err != nil {
-			l.errors <- fmt.Errorf("view %s: %v", view.GetName(), err)
+			l.update(&gui.Event{
+				T:     gui.Update,
+				Views: []string{view.GetName()},
+			})
 		}
 	}
 }
 
 func (l *Layout) update(event *gui.Event) {
-	if event.View == "" {
+	if len(event.Views) == 0 {
 		for _, view := range l.views {
 			err := view.Update(l.g, event.Repo)
 			if err != nil {
@@ -90,42 +72,47 @@ func (l *Layout) update(event *gui.Event) {
 		}
 		return
 	}
-	view, ok := l.views[event.View]
-	if ok {
-		err := view.Update(l.g, event.Repo)
-		if err != nil {
-			l.errors <- fmt.Errorf("view %s: %v", view.GetName(), err)
+	for _, name := range event.Views {
+		view, ok := l.views[name]
+		if ok {
+			err := view.Update(l.g, event.Repo)
+			if err != nil {
+				l.errors <- fmt.Errorf("view %s: %v", view.GetName(), err)
+			}
 		}
 	}
 }
 
 func (l *Layout) delete(event *gui.Event) {
-	view, ok := l.views[event.View]
-	if ok {
-		err := l.g.DeleteView(event.View)
-		if err != nil {
-			l.errors <- fmt.Errorf("view %s: %v", view.GetName(), err)
-		}
-		delete(l.views, event.View)
-		l.events <- &gui.Event{
-			T:    gui.Update,
-			View: "repositories",
+	for _, name := range event.Views {
+		view, ok := l.views[name]
+		if ok {
+			err := l.g.DeleteView(name)
+			if err != nil {
+				l.errors <- fmt.Errorf("view %s: %v", view.GetName(), err)
+			}
+			delete(l.views, name)
+			l.update(&gui.Event{
+				T:     gui.Update,
+				Views: []string{"repositories"},
+			})
 		}
 	}
 }
 
 func (l *Layout) addView(event *gui.Event) {
-	view := CreateView(event.View, l.g, l.manager, l.events)
-	if view != nil {
-		l.views[view.GetName()] = view
-		l.events <- &gui.Event{
-			T: gui.Draw,
+	for _, name := range event.Views {
+		view := CreateView(name, l.g, l.manager, l.events)
+		if view != nil {
+			l.views[view.GetName()] = view
+			err := view.Draw(l.g)
+			if err != nil {
+				l.errors <- fmt.Errorf("view %s: %v", view.GetName(), err)
+			}
+			err = view.Update(l.g, event.Repo)
+			if err != nil {
+				l.errors <- fmt.Errorf("view %s: %v", view.GetName(), err)
+			}
 		}
-		l.events <- &gui.Event{
-			T:    gui.Update,
-			View: view.GetName(),
-		}
-		return
 	}
-	l.errors <- fmt.Errorf("unknown view %s", event.View)
 }

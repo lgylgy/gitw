@@ -56,8 +56,8 @@ func (av *ActionsView) Draw(g *gocui.Gui) error {
 		}
 		err = g.SetKeybinding(av.View.name, gocui.KeyCtrlX, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 			av.events <- &Event{
-				T:    Remove,
-				View: av.GetName(),
+				T:     Remove,
+				Views: []string{av.GetName()},
 			}
 			return nil
 		})

@@ -63,8 +63,20 @@ func (sbv *SidebarView) Draw(g *gocui.Gui) error {
 		}
 		err = g.SetKeybinding(sbv.View.name, gocui.KeySpace, gocui.ModNone, func(*gocui.Gui, *gocui.View) error {
 			sbv.events <- &Event{
-				T:    Add,
-				View: "actions",
+				T:     Add,
+				Repo:  sbv.manager.Select(sbv.index),
+				Views: []string{"actions"},
+			}
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+		err = g.SetKeybinding(sbv.View.name, gocui.KeyTab, gocui.ModNone, func(*gocui.Gui, *gocui.View) error {
+			sbv.events <- &Event{
+				T:     Add,
+				Repo:  sbv.manager.Select(sbv.index),
+				Views: []string{"staged-changes", "unstaged-changes"},
 			}
 			return nil
 		})
