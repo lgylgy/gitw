@@ -2,6 +2,7 @@ package git
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
 )
 
@@ -48,6 +49,33 @@ func getDiff(dir string, cached bool) (string, error) {
 	if cached {
 		args = append(args, "--cached")
 	}
+	output, err := cmd(dir, args)
+	if err != nil {
+		return "", err
+	}
+	return output, err
+}
+
+func fetch(dir, remote string) (string, error) {
+	args := []string{"git", "fetch", remote}
+	output, err := cmd(dir, args)
+	if err != nil {
+		return "", err
+	}
+	return output, err
+}
+
+func resetHard(dir, remote, branch string) (string, error) {
+	args := []string{"git", "reset", "--hard", fmt.Sprintf("%s/%s", remote, branch)}
+	output, err := cmd(dir, args)
+	if err != nil {
+		return "", err
+	}
+	return output, err
+}
+
+func push(dir, remote, branch string) (string, error) {
+	args := []string{"git", "push", remote, branch}
 	output, err := cmd(dir, args)
 	if err != nil {
 		return "", err

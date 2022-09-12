@@ -12,16 +12,20 @@ type View interface {
 	GetName() string
 }
 
-func CreateDefaultViews(g *gocui.Gui, manager *git.Manager, events chan<- *gui.Event) map[string]View {
+func CreateDefaultViews(g *gocui.Gui, manager *git.Manager,
+	events chan<- *gui.Event, results chan *git.Result) map[string]View {
+
 	return map[string]View{
-		"repositories": CreateView("repositories", g, manager, events),
-		"branch":       CreateView("branch", g, manager, events),
-		"remotes":      CreateView("remotes", g, manager, events),
-		"content":      CreateView("content", g, manager, events),
+		"repositories": CreateView("repositories", g, manager, events, results),
+		"branch":       CreateView("branch", g, manager, events, results),
+		"remotes":      CreateView("remotes", g, manager, events, results),
+		"content":      CreateView("content", g, manager, events, results),
 	}
 }
 
-func CreateView(name string, g *gocui.Gui, manager *git.Manager, events chan<- *gui.Event) View {
+func CreateView(name string, g *gocui.Gui, manager *git.Manager,
+	events chan<- *gui.Event, results chan *git.Result) View {
+
 	switch name {
 	case "repositories":
 		return gui.NewSidebarView(g, events, manager)
@@ -32,7 +36,9 @@ func CreateView(name string, g *gocui.Gui, manager *git.Manager, events chan<- *
 	case "content":
 		return gui.NewContentView(g)
 	case "actions":
-		return gui.NewActionsView(events, manager)
+		return gui.NewActionsView(events, manager, results)
+	case "output":
+		return gui.NewOutputView(g, results)
 	case "unstaged-changes":
 		return gui.NewDiffView(events, manager, false)
 	case "staged-changes":

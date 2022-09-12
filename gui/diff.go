@@ -48,7 +48,7 @@ func NewDiffView(events chan<- *Event, manager *git.Manager, cached bool) *DiffV
 func (dv *DiffView) Draw(g *gocui.Gui) error {
 	view, err := dv.View.draw(g)
 	if err == gocui.ErrUnknownView {
-		err = g.SetKeybinding("", gocui.KeyCtrlX, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		err = g.SetKeybinding("", gocui.KeyTab, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 			dv.events <- &Event{
 				T:     Remove,
 				Views: []string{getName(false), getName(true)},

@@ -13,17 +13,20 @@ type Layout struct {
 	manager *git.Manager
 	views   map[string]View
 	events  chan *gui.Event
+	results chan *git.Result
 	errors  chan error
 }
 
 func NewLayout(g *gocui.Gui, manager *git.Manager) *Layout {
 	events := make(chan *gui.Event, 2)
 	errors := make(chan error, 2)
+	results := make(chan *git.Result)
 	layout := &Layout{
 		g:       g,
 		manager: manager,
-		views:   CreateDefaultViews(g, manager, events),
+		views:   CreateDefaultViews(g, manager, events, results),
 		events:  events,
+		results: results,
 		errors:  errors,
 	}
 	go layout.run()
@@ -102,7 +105,7 @@ func (l *Layout) delete(event *gui.Event) {
 
 func (l *Layout) addView(event *gui.Event) {
 	for _, name := range event.Views {
-		view := CreateView(name, l.g, l.manager, l.events)
+		view := CreateView(name, l.g, l.manager, l.events, l.results)
 		if view != nil {
 			l.views[view.GetName()] = view
 			err := view.Draw(l.g)

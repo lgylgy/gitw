@@ -5,10 +5,32 @@ func NewManager(repos *Repositories) *Manager {
 		repos: repos,
 		actions: []*Action{
 			{
-				"fetch -> reset --hard upstream",
+				Label: "fetch -> reset --hard upstream",
+				Process: func(dir string, msg chan *Result) {
+					output, err := fetch(dir, "upstream")
+					msg <- &Result{
+						Output: output,
+						Err:    err,
+					}
+					if err != nil {
+						return
+					}
+					output, err = resetHard(dir, "upstream", "master")
+					msg <- &Result{
+						Output: output,
+						Err:    err,
+					}
+				},
 			},
 			{
-				"push origin HEAD",
+				Label: "push origin HEAD",
+				Process: func(dir string, msg chan *Result) {
+					output, err := push(dir, "origin", "HEAD")
+					msg <- &Result{
+						Output: output,
+						Err:    err,
+					}
+				},
 			},
 		},
 		current: 0,
@@ -40,4 +62,11 @@ func (m *Manager) ListActions() []string {
 		result = append(result, action.Label)
 	}
 	return result
+}
+
+func (m *Manager) GetAction(index int) *Action {
+	if index >= len(m.ListActions()) {
+		return nil
+	}
+	return m.actions[index]
 }

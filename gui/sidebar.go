@@ -65,7 +65,7 @@ func (sbv *SidebarView) Draw(g *gocui.Gui) error {
 			sbv.events <- &Event{
 				T:     Add,
 				Repo:  sbv.manager.Select(sbv.index),
-				Views: []string{"actions"},
+				Views: []string{"actions", "output"},
 			}
 			return nil
 		})
